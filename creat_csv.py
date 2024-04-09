@@ -51,9 +51,13 @@ Other Income Units(can probably ignore this one )
 '''
 
 
+#file name: https://data.cityofnewyork.us/Housing-Development/Affordable-Housing-Production-by-Building/hg8x-zxpr/about_data
+
+
 #def merge_income_vals(extremely_low, very_low, low, moderate, middle):
 def merge_income_vals(count_list):
     #total = extremely_low + very_low + low + moderate + middle
+    #count_list = 
     weight_vector = np.array([1,2,3,4,5]) #skipping zero, so that there is less "exceptions"
     #lue_vector = np.array([extremely_low, very_low, low, moderate, middle])
     value_vector = np.array(count_list)
@@ -66,7 +70,27 @@ def merge_income_vals(count_list):
         return "low"
     else: #greater than 3
         return "moderately_low"
-        
+    
+def rental_rate(input):
+    rented = input[0]
+    owned = input[1]
+    total = input[2]
+    if rented/total > .5:
+        return "mostly_rented"
+    elif owned/total > .5:
+        return "mostly_owned"
+    else:
+        return "unclear" 
+def afford_reg(input2):
+    affordable = input2[0]
+    total = input2[1]
+    ratio = affordable/total
+    if ratio > .7:
+        return "mostly_affordable"
+    if ratio < .3:
+        return "mostly_standard"
+    else:
+        return "mixed_aff_and_stand"       
 
 #loop through df and merge these values in this 
 #update dataframe 
@@ -81,7 +105,7 @@ def main():
                                                                                     'Counted Rental Units', 'Counted Homeownership Units', 'All Counted Units',	
                                                                                     'Total Units'
       ])
-
+    #poverty levels 
       columns_to_merge = ['Extremely Low Income Units','Very Low Income Units','Low Income Units', 'Moderate Income Units','Middle Income Units']
       new_column = []
       #create new values into a list 
@@ -89,14 +113,44 @@ def main():
           update_vals = df.loc[i,columns_to_merge]
           new_label = merge_income_vals(update_vals)
           new_column.append(new_label)
-
       #append new_column to df 
       df['Income'] = new_column
       #remove columns to merge
       df = df.drop(columns=columns_to_merge)
+
+      #rented vs owned counter 
+      ro_cols = ['Counted Rental Units', 'Counted Homeownership Units', 'All Counted Units']
+      ro_new = []
+      for i,row in df.iterrows():
+          update_vals2 = df.loc[i,ro_cols]
+          new_label = rental_rate(update_vals2)
+          ro_new.append(new_label)
+      df['Rented_vs_Owned'] = ro_new
+
+      #towards affordable ratio
+      afford_cols = ['All Counted Units','Total Units']
+      aff_new = []
+      for i,row in df.iterrows():
+          update_vals3 = df.loc[i,afford_cols]
+          new_label = afford_reg(update_vals3)
+          aff_new.append(new_label)
+      df['Level of Affordable in Building'] = aff_new
+
+      dropping_cols = ['Counted Rental Units', 'Counted Homeownership Units', 'All Counted Units','Total Units']
+      df = df.drop(columns=dropping_cols)
+
+      #dropping post bin bil and super unit
+      bin_bil = ['Postcode','BBL','BIN','Other Income Units']
+      df = df.drop(columns=bin_bil)
+
+      #analysis purpose 
+      #data[‘column_name’].value_counts()[value]
+
+
+
       #write to output 
       df.to_csv('modified_housing.csv', index=False)
-      print(df[:10])
+      #print(df[:10])
 
 if __name__ == "__main__":
     main()
