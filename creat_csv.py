@@ -63,13 +63,15 @@ def merge_income_vals(count_list):
     value_vector = np.array(count_list)
     total = np.sum(value_vector)
     #multiply each by the percentage of score 
+    #a lot fall between 2.95 and 3 
     score = np.dot(weight_vector,value_vector)/total
-    if score < 1:
+    if score < 1.85:
         return "very_low"
-    elif score >=1 and score <= 3:
+    elif score >=1.85 and score <= 3:
         return "low"
     else: #greater than 3
         return "moderately_low"
+    #these currently give is a dist of 756 for very low, 3937 for low, and 2560 for moderately low 
     
 def rental_rate(input):
     rented = input[0]
@@ -145,8 +147,15 @@ def main():
 
       #analysis purpose 
       #data[‘column_name’].value_counts()[value]
-
-
+      mod_income = df["Income"].value_counts()['moderately_low']
+      low_income = df["Income"].value_counts()['low']
+      try:
+        very_low_income = df["Income"].value_counts()['very_low']
+      except:
+          very_low_income = 0
+      print("moderate income count: ", mod_income)
+      print("low income count: ", low_income)
+      print("very low income count: ", very_low_income)
 
       #write to output 
       df.to_csv('modified_housing.csv', index=False)
