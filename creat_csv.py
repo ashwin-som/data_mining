@@ -145,6 +145,9 @@ def main():
       bin_bil = ['Postcode','BBL','BIN','Other Income Units']
       df = df.drop(columns=bin_bil)
 
+      #remvoe project id: 
+      df = df.drop(columns=['Project ID'])
+
       #analysis purpose 
       #data[‘column_name’].value_counts()[value]
       mod_income = df["Income"].value_counts()['moderately_low']
