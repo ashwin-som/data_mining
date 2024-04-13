@@ -1,5 +1,6 @@
 import pandas as pd
 import sys
+from itertools import combinations
 
 dataset = None   #stores the data so we can access the records and calculate support whenever needed
 
@@ -23,6 +24,33 @@ def generate_candidates(df,occurence_counts,k):
 
     return occurence_counts
 
+def apriori_gen(l,k,support):
+    candidates = []
+    for i in range(len(l)):
+        for j in range(i+1,len(l)):
+            p = list(l[i])
+            q = list(l[j])
+            p.sort()
+            q.sort()
+            if p[:-1] == p[:-1] and p[-1] < q[-1]:
+                c = l[i].union({q[-1]})
+                candidates.append(c)
+
+    #prune step
+    final_candidates = []
+    for c in candidates:
+        subsets = []
+        for comb in combinations(c,k-1):
+            subsets.append(comb)
+        flag = False
+        for subset in subsets:
+            if subset not in l:
+                flag = True
+                break
+        if not flag:
+            final_candidates.append(c)
+
+    return final_candidates
 
 
 
@@ -43,11 +71,11 @@ def find_new_item_sets(c_k,k,support):
 
 def apriori(item_sets,support):
     k = 0
-    l_k = set() #originally only contains  the empty element
+    l_k = set() #this is supposed to contain the large 1-itemsets.
     freq_item_sets = set()
     while True:
         k+=1
-        c_k = generate_candidates(l_k,k,support)
+        c_k = apriori_gen(l_k,k,support)
         l_k = find_new_item_sets(c_k,k,support)
         if len(l_k)==0:
             break
