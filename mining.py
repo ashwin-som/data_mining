@@ -1,7 +1,7 @@
 import pandas as pd
 import sys
 from itertools import combinations
-
+import math
 dataset = None   #stores the data so we can access the records and calculate support whenever needed
 
 
@@ -21,7 +21,7 @@ dataset = None   #stores the data so we can access the records and calculate sup
     #compute the rest for k bwetween 2 and 6
     #incorporate pruning -> ie only add if confidence of each inidividual item exists 
 
-def create_l1(df,occurence_counts):
+def create_l1(df,occurence_counts, support):
     for index, row in df.iterrows():
             for col in df.keys().tolist():
                 value = row[col]
@@ -30,7 +30,12 @@ def create_l1(df,occurence_counts):
                 else:
                     occurence_counts[(value,)] = 1
 
-
+    to_delete = set()
+    for i in occurence_counts:
+        if occurence_counts[i]<support:
+           to_delete.add(i)
+    for i in to_delete:
+        del occurence_counts[i]
     return occurence_counts
 
 def apriori_gen(l,k,support): #C 
@@ -105,11 +110,11 @@ def apriori_take2(item_sets,support,database):
 
 #modification to this -> convert data structure to be list of length 6 for C and L that store dictioanry 
 #while k <= 6 instead of true bc we already have the break statemetn
-def apriori(item_sets,support):
+def apriori(l1,support):
     k = 0
     #l_1 = {}
     #l_1 = create_l1(database,l_1)
-    l_k = set() #this is supposed to contain the large 1-itemsets.
+    l_k = l1 #this is supposed to contain the large 1-itemsets.
     freq_item_sets = set()
     while True:
         k+=1
@@ -127,12 +132,16 @@ def mine_association_rules(freq_item_sets):
 def main(): 
 
     '''   NOTE: k can be up to 6 for this specific file '''
+    support = float(sys.argv[1])
+    confidence = sys.argv[2]
 
     dataset = pd.read_csv('modified_housing.csv')
     num_transactions = len(dataset) #use this to calculate support 
     frequency_count = {}
-    individual_count = create_l1(dataset,frequency_count,1)
-    print(individual_count)
+    support_count = math.ceil(num_transactions*support)
+    individual_count = create_l1(dataset,frequency_count,support_count)
+    for i in individual_count:
+        print(i,': ',individual_count[i])
     
     '''support = sys.argv[1]
     confidence = sys.argv[2]
