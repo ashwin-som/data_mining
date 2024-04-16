@@ -22,7 +22,8 @@ dataset = None   #stores the data so we can access the records and calculate sup
     #compute the rest for k bwetween 2 and 6
     #incorporate pruning -> ie only add if confidence of each inidividual item exists 
 
-def create_l1(df,occurence_counts, support):
+def create_l1(df, support):
+    occurence_counts = {}
     for index, row in df.iterrows():
             for col in df.keys().tolist():
                 value = row[col]
@@ -70,7 +71,7 @@ def apriori_gen(l,k,support): #C
         
 
 def create_candidates(prev_dictionary,k):
-    prev_set = ()
+    prev_set = set()
     for key in prev_dictionary:
         for item in key:
             if item not in prev_set:
@@ -150,12 +151,12 @@ def apriori_take2(item_sets,support,database):
 
 #modification to this -> convert data structure to be list of length 6 for C and L that store dictioanry 
 #while k <= 6 instead of true bc we already have the break statemetn
-def apriori(item_sets,support,database):
+def apriori(database,support):
     k = 0
     L= []
     C=[]
     #l_1 = {}
-    l_1 = create_l1(database,l_1)
+    l_1 = create_l1(database,support)
     #l_k = set() #this is supposed to contain the large 1-itemsets.
     #freq_item_sets = set()
     L.append(l_1)
@@ -164,7 +165,8 @@ def apriori(item_sets,support,database):
         c_k = create_candidates(L[k-2],k) #compute options on database given prev exiisting options 
         #l_k = find_new_item_sets(c_k,k,support) #iterate through database to see if possible 
         l_k = database_item_set(c_k,database,k, support)
-        if len(l_k)==0:
+        #if len(l_k)==0:
+        if not l_k:
             break
         else:
             #freq_item_sets.append(i for i in l_k)
@@ -205,7 +207,11 @@ def main():
     dataset = pd.read_csv('modified_housing.csv')
     num_transactions = len(dataset) #use this to calculate support 
     frequency_count = {}
-    individual_count = create_l1(dataset,frequency_count,1)
+    updated_support = support*num_transactions
+    individual_count = create_l1(dataset,updated_support )
+    L, C = apriori(dataset,updated_support)
+    print("L: ", L)
+    print("C: ", C)
     print(individual_count)
     
     '''support = sys.argv[1]
@@ -214,10 +220,11 @@ def main():
     itemsets = set()
 
     freq_item_sets = apriori(itemsets) #freq_item_sets should be a list of dictionaries
-
+'''
 
     #printing the association rules
-    assoc_rules = mine_association_rules(freq_item_sets,confidence,num_transactions)
+    
+    assoc_rules = mine_association_rules(L,confidence,num_transactions)
     print('==High-confidence association rules (min_conf={0}%)'.format(confidence*100))
     heap = []
     for rule in assoc_rules:
