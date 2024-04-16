@@ -78,7 +78,7 @@ def create_candidates(prev_dictionary,k):
                 prev_set.add(item)
     #now convert all items to be pairings based of k 
     candidates = {}
-    for combo in combinations(prev_set,k-1):
+    for combo in combinations(prev_set,k):
             #candidates.append(combo)
             candidates[combo] = 0 
     return candidates 
@@ -86,18 +86,32 @@ def create_candidates(prev_dictionary,k):
 def database_item_set(candidates,database,k, support):
     #iterate through database
     #if combo exists in row ++ val in dictionary 
+    print("value of k is: ", k)
+    print("value of support is: ", support)
+
+
     for index, row in database.iterrows():
         row_items = []
         for col in database.keys().tolist():
             value = row[col]
             row_items.append(value)
         #generate tuple pairings in row 
+        #print("row items: ",row_items)
+        #print("k-val: ",k)
         for combo in combinations(row_items,k):
+            #print("combo is: ", combo)
             if combo in candidates:
+                #print("combo is in candidates")
                 candidates[combo] += 1 
     
     #now delete items in candidates if does not reach supposrt 
-    
+    to_delete = set()
+    for i in candidates:
+        if candidates[i]<support:
+           to_delete.add(i)
+    for i in to_delete:
+        del candidates[i]
+    return candidates
         
 
 
@@ -152,7 +166,7 @@ def apriori_take2(item_sets,support,database):
 #modification to this -> convert data structure to be list of length 6 for C and L that store dictioanry 
 #while k <= 6 instead of true bc we already have the break statemetn
 def apriori(database,support):
-    k = 0
+    k = 1
     L= []
     C=[]
     #l_1 = {}
@@ -161,12 +175,15 @@ def apriori(database,support):
     #freq_item_sets = set()
     L.append(l_1)
     while k <= 6:
+        print("k-value is:", k)
         k+=1
         c_k = create_candidates(L[k-2],k) #compute options on database given prev exiisting options 
+        #print(c_k)
         #l_k = find_new_item_sets(c_k,k,support) #iterate through database to see if possible 
         l_k = database_item_set(c_k,database,k, support)
         #if len(l_k)==0:
         if not l_k:
+            print(k)
             break
         else:
             #freq_item_sets.append(i for i in l_k)
@@ -210,9 +227,14 @@ def main():
     updated_support = support*num_transactions
     individual_count = create_l1(dataset,updated_support )
     L, C = apriori(dataset,updated_support)
-    print("L: ", L)
-    print("C: ", C)
-    print(individual_count)
+    for i,dict in enumerate(L): 
+        if i > 0:
+            print("L at index ",i+1, ": ", dict)
+        print()
+        print()
+        print()
+    #print("C: ", C)
+    #print(individual_count)
     
     '''support = sys.argv[1]
     confidence = sys.argv[2]
@@ -223,7 +245,7 @@ def main():
 '''
 
     #printing the association rules
-    
+    '''
     assoc_rules = mine_association_rules(L,confidence,num_transactions)
     print('==High-confidence association rules (min_conf={0}%)'.format(confidence*100))
     heap = []
@@ -232,7 +254,7 @@ def main():
     while heap:
         item = heapq.heappop(heap)
         print('{1} (Conf: {1}%, Supp: {2}%)'.format(item[2],item[0],item[1]))
-
+    '''
 
 if __name__=="__main__": 
     main() 
