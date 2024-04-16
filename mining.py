@@ -2,6 +2,7 @@ import pandas as pd
 import sys
 from itertools import combinations
 import math
+import heapq
 dataset = None   #stores the data so we can access the records and calculate support whenever needed
 
 
@@ -126,8 +127,28 @@ def apriori(l1,support):
             freq_item_sets.append(i for i in l_k)
     return freq_item_sets
 
-def mine_association_rules(freq_item_sets):
-    pass
+def mine_association_rules(freq_list, conf_threshold,length_of_dataset):
+    freq_item_sets = set()
+    for map in freq_list:
+        for i in map:
+            freq_item_sets[i] = map[i]/length_of_dataset
+    
+    assoc_rules = {}
+    for itemset in freq_item_sets:
+        for i in itemset:
+            rhs = tuple([i])
+            lhs = list(itemset.copy())
+            lhs.remove(rhs)
+            lhs = tuple(lhs)
+            possible_lhs = []
+            for k in range(1,len(lhs)+1):
+                possible_lhs.extend(combinations(lhs,k))
+            for LHS in possible_lhs:
+                confidence_val = freq_item_sets[itemset]/freq_item_sets[LHS]
+                if confidence_val>=conf_threshold:
+                    key = repr(lhs)+'=>'+repr(rhs)
+                    assoc_rules[key] = (confidence_val,freq_item_sets[itemset])
+    return assoc_rules
 
 def main(): 
 
@@ -143,18 +164,22 @@ def main():
     for i in individual_count:
         print(i,': ',individual_count[i])
     
-    '''support = sys.argv[1]
-    confidence = sys.argv[2]
     #generate initial item_sets
     itemsets = set()
 
-    freq_item_sets = apriori(itemsets)
+    freq_item_sets = apriori(itemsets) #freq_item_sets should be a list of dictionaries
 
-    assoc_rules = mine_association_rules(freq_item_sets,confidence)
 
-    #print freq item sets and association rules
-    print(freq_item_sets)
-    print(assoc_rules)'''
+    #printing the association rules
+    assoc_rules = mine_association_rules(freq_item_sets,confidence,num_transactions)
+    print('==High-confidence association rules (min_conf={0}%)'.format(confidence*100))
+    heap = []
+    for rule in assoc_rules:
+        heapq.heappush(heap,(assoc_rules[rule][0],assoc_rules[rule][1],rule))
+    while heap:
+        item = heapq.heappop(heap)
+        print('{1} (Conf: {1}%, Supp: {2}%)'.format(item[2],item[0],item[1]))
+
 
 if __name__=="__main__": 
     main() 
