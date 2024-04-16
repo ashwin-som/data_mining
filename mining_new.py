@@ -96,7 +96,13 @@ def database_item_set(candidates,database,k, support):
                 candidates[combo] += 1 
     
     #now delete items in candidates if does not reach supposrt 
-    
+    to_delete = set()
+    for i in candidates:
+        if candidates[i]<support:
+           to_delete.add(i)
+    for i in to_delete:
+        del candidates[i]
+    return candidates
         
 
 
@@ -150,20 +156,19 @@ def apriori_take2(item_sets,support,database):
 
 #modification to this -> convert data structure to be list of length 6 for C and L that store dictioanry 
 #while k <= 6 instead of true bc we already have the break statemetn
-def apriori(item_sets,support,database):
+def apriori(item_sets,support):
     k = 0
-    L= []
-    C=[]
     #l_1 = {}
-    l_1 = create_l1(database,l_1)
-    #l_k = set() #this is supposed to contain the large 1-itemsets.
-    #freq_item_sets = set()
+    #l_1 = create_l1(database,l_1)
+    L = []
+    C = []
+    l_k = set() #this is supposed to contain the large 1-itemsets.
+    freq_item_sets = set()
     L.append(l_1)
     while k <= 6:
         k+=1
         c_k = create_candidates(L[k-2],k) #compute options on database given prev exiisting options 
-        #l_k = find_new_item_sets(c_k,k,support) #iterate through database to see if possible 
-        l_k = database_item_set(c_k,database,k, support)
+        l_k = find_new_item_sets(c_k,k,support) #iterate through database to see if possible 
         if len(l_k)==0:
             break
         else:
