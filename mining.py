@@ -7,7 +7,7 @@ dataset = None   #stores the data so we can access the records and calculate sup
 
 
 
-def generate_candidates(df,occurence_counts,k):
+'''def generate_candidates(df,occurence_counts,k):
     #depending on value for k, update dictionary_counts 
     if k==1: #iterate through whole database 
         for index, row in df.iterrows():
@@ -16,15 +16,24 @@ def generate_candidates(df,occurence_counts,k):
                 if (value,) in occurence_counts:
                     occurence_counts[(value,)] += 1 
                 else:
-                    occurence_counts[(value,)] = 1 
+                    occurence_counts[(value,)] = 1 '''
     
     #compute the rest for k bwetween 2 and 6
     #incorporate pruning -> ie only add if confidence of each inidividual item exists 
 
+def create_l1(df,occurence_counts):
+    for index, row in df.iterrows():
+            for col in df.keys().tolist():
+                value = row[col]
+                if (value,) in occurence_counts:
+                    occurence_counts[(value,)] += 1 
+                else:
+                    occurence_counts[(value,)] = 1
+
 
     return occurence_counts
 
-def apriori_gen(l,k,support):
+def apriori_gen(l,k,support): #C 
     candidates = []
     for i in range(len(l)):
         for j in range(i+1,len(l)):
@@ -61,7 +70,7 @@ def compute_support(tup,occurence_counts,num_rows):
         support = 0
     return support 
 
-def find_new_item_sets(c_k,k,support):
+def find_new_item_sets(c_k,k,support): #L -> I think this should be a dictionary 
     res = []
     for c in c_k:
         if compute_support(c)>=support:
@@ -69,8 +78,37 @@ def find_new_item_sets(c_k,k,support):
     return res
 
 
+def TID_C_K(): #C-head
+    #do we even really need to do this? 
+    #may be necessary for computing support? to see if they exist together?
+    pass
+
+
+
+### essentially need to decide if we want to do AprioriTid or Apriori -> up to us ###
+### let's look at runtime ####
+
+
+def apriori_take2(item_sets,support,database):
+    L = []
+    C = []
+    l_1 = {}
+    l_1 = create_l1(database,l_1)
+    L.append(l_1)
+    C.append({}) #C[0] is essentially empty but keep formatting 
+    k = 2
+    while k <= 6: #iterate through k 
+        if L[k-2] == {}: #if nothing generated for previous k 
+            break
+        C_kmin1 = apriori_gen(L[k-2],k,support)
+        C.append(C_kmin1)
+
+#modification to this -> convert data structure to be list of length 6 for C and L that store dictioanry 
+#while k <= 6 instead of true bc we already have the break statemetn
 def apriori(item_sets,support):
     k = 0
+    #l_1 = {}
+    #l_1 = create_l1(database,l_1)
     l_k = set() #this is supposed to contain the large 1-itemsets.
     freq_item_sets = set()
     while True:
@@ -93,7 +131,7 @@ def main():
     dataset = pd.read_csv('modified_housing.csv')
     num_transactions = len(dataset) #use this to calculate support 
     frequency_count = {}
-    individual_count = generate_candidates(dataset,frequency_count,1)
+    individual_count = create_l1(dataset,frequency_count,1)
     print(individual_count)
     
     '''support = sys.argv[1]
