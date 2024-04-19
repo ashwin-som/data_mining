@@ -193,7 +193,7 @@ def apriori(database,support):
     return L,C
 
 def mine_association_rules(freq_list, conf_threshold,length_of_dataset):
-    freq_item_sets = set()
+    freq_item_sets = {}
     for map in freq_list:
         for i in map:
             freq_item_sets[i] = map[i]/length_of_dataset
@@ -202,13 +202,15 @@ def mine_association_rules(freq_list, conf_threshold,length_of_dataset):
     for itemset in freq_item_sets:
         for i in itemset:
             rhs = tuple([i])
-            lhs = list(itemset.copy())
-            lhs.remove(rhs)
+            lhs = list(itemset).copy()
+            lhs.remove(rhs[0])
             lhs = tuple(lhs)
             possible_lhs = []
             for k in range(1,len(lhs)+1):
                 possible_lhs.extend(combinations(lhs,k))
             for LHS in possible_lhs:
+                if LHS not in freq_item_sets:
+                    continue
                 confidence_val = freq_item_sets[itemset]/freq_item_sets[LHS]
                 if confidence_val>=conf_threshold:
                     key = repr(lhs)+'=>'+repr(rhs)
@@ -219,7 +221,7 @@ def main():
 
     '''   NOTE: k can be up to 6 for this specific file '''
     support = float(sys.argv[1])
-    confidence = sys.argv[2]
+    confidence = float(sys.argv[2])
 
     dataset = pd.read_csv('modified_housing.csv')
     num_transactions = len(dataset) #use this to calculate support 
@@ -233,6 +235,7 @@ def main():
         print()
         print()
         print()
+    #print(L)
     #print("C: ", C)
     #print(individual_count)
     
@@ -245,16 +248,16 @@ def main():
 '''
 
     #printing the association rules
-    '''
+    
     assoc_rules = mine_association_rules(L,confidence,num_transactions)
     print('==High-confidence association rules (min_conf={0}%)'.format(confidence*100))
     heap = []
     for rule in assoc_rules:
-        heapq.heappush(heap,(assoc_rules[rule][0],assoc_rules[rule][1],rule))
+        heapq.heappush(heap,(assoc_rules[rule][0]*-1,assoc_rules[rule][1]*-1,rule))
     while heap:
         item = heapq.heappop(heap)
-        print('{1} (Conf: {1}%, Supp: {2}%)'.format(item[2],item[0],item[1]))
-    '''
+        print('{0} (Conf: {1}%, Supp: {2}%)'.format(item[2],item[0]*-100,item[1]*-100))
+    
 
 if __name__=="__main__": 
     main() 
