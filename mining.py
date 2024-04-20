@@ -86,8 +86,10 @@ def create_candidates(prev_dictionary,k):
             if item not in prev_set:
                 prev_set.add(item)
     #now convert all items to be pairings based of k 
+    #convert set into a list and sort it so it is consistent 
+    set_list = sorted(prev_set)
     candidates = {}
-    for combo in combinations(prev_set,k):
+    for combo in combinations(set_list,k):
             #candidates.append(combo)
             candidates[combo] = 0 
     return candidates 
@@ -198,6 +200,7 @@ def apriori(database,support):
         print("k-value is:", k)
         k+=1
         c_k = create_candidates(L[k-2],k) #compute options on database given prev exiisting options 
+        #print("c_k at index ", k, " is:", c_k)
         #print(c_k)
         #l_k = find_new_item_sets(c_k,k,support) #iterate through database to see if possible 
         l_k = database_item_set(c_k,database,k, support)
@@ -252,12 +255,12 @@ def main():
     updated_support = support*num_transactions
     individual_count = create_l1(dataset,updated_support )
     L, C = apriori(dataset,updated_support)
-    for i,dict in enumerate(L): 
+    '''for i,dict in enumerate(L): 
         #if i > 0:
         print("L at index ",i+1, ": ", dict)
         print()
         print()
-        print()
+        print()'''
 
     print('==Frequent itemsets (min_supp={0}%)'.format(support*100))
     heap_support = []
