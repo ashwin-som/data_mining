@@ -25,8 +25,15 @@ dataset = None   #stores the data so we can access the records and calculate sup
 def create_l1(df, support):
     occurence_counts = {}
     for index, row in df.iterrows():
+            
             for col in df.keys().tolist():
                 value = row[col]
+                if value != value:
+                    print("row #: ", index)
+                    print("column #: ", col)
+                '''if (value, ) == (nan,):
+                    print("row #: ", index)
+                    print("column #: ", col)'''
                 if (value,) in occurence_counts:
                     occurence_counts[(value,)] += 1 
                 else:
@@ -38,6 +45,8 @@ def create_l1(df, support):
            to_delete.add(i)
     for i in to_delete:
         del occurence_counts[i]
+
+    
     return occurence_counts
 
 def apriori_gen(l,k,support): #C 
@@ -86,8 +95,8 @@ def create_candidates(prev_dictionary,k):
 def database_item_set(candidates,database,k, support):
     #iterate through database
     #if combo exists in row ++ val in dictionary 
-    print("value of k is: ", k)
-    print("value of support is: ", support)
+    #print("value of k is: ", k)
+    #print("value of support is: ", support)
 
 
     for index, row in database.iterrows():
@@ -101,16 +110,27 @@ def database_item_set(candidates,database,k, support):
         for combo in combinations(row_items,k):
             #print("combo is: ", combo)
             if combo in candidates:
+
+                for item in combo:
+                    if item == 'nan':
+                        print("printing row items: ",row_items)
+
                 #print("combo is in candidates")
                 candidates[combo] += 1 
     
     #now delete items in candidates if does not reach supposrt 
+
+    #print("candidates pre deletion for item size ",k, ": ", candidates)
+    #return candidates
+
     to_delete = set()
     for i in candidates:
         if candidates[i]<support:
            to_delete.add(i)
     for i in to_delete:
         del candidates[i]
+
+    #print("candidates for item size ",k, ": ", candidates)
     return candidates
         
 
@@ -220,25 +240,40 @@ def mine_association_rules(freq_list, conf_threshold,length_of_dataset):
 def main(): 
 
     '''   NOTE: k can be up to 6 for this specific file '''
+    #support = .01
+    #confidence = .1
     support = float(sys.argv[1])
     confidence = float(sys.argv[2])
 
     dataset = pd.read_csv('modified_housing.csv')
     num_transactions = len(dataset) #use this to calculate support 
+    print("nun transactions: ", num_transactions)
     frequency_count = {}
     updated_support = support*num_transactions
     individual_count = create_l1(dataset,updated_support )
     L, C = apriori(dataset,updated_support)
     for i,dict in enumerate(L): 
-        if i > 0:
-            print("L at index ",i+1, ": ", dict)
+        #if i > 0:
+        print("L at index ",i+1, ": ", dict)
         print()
         print()
         print()
+
+    print('==Frequent itemsets (min_supp={0}%)'.format(support*100))
+    heap_support = []
+    for dict in L:
+        for key in dict:
+            support = dict[key]
+            proper_support = support/num_transactions
+            heapq.heappush(heap_support,(key,proper_support*100))
+    while heap_support:
+        item = heapq.heappop(heap_support)
+        print('{0},  {1}%'.format(list(item[0]),item[1]))
     #print(L)
     #print("C: ", C)
     #print(individual_count)
-    
+    print()
+    print()
     '''support = sys.argv[1]
     confidence = sys.argv[2]
     #generate initial item_sets

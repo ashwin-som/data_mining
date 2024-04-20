@@ -107,6 +107,8 @@ def main():
                                                                                     'Counted Rental Units', 'Counted Homeownership Units', 'All Counted Units',	
                                                                                     'Total Units'
       ])
+      #drop empty cells 
+      df = df.dropna()
     #poverty levels 
       columns_to_merge = ['Extremely Low Income Units','Very Low Income Units','Low Income Units', 'Moderate Income Units','Middle Income Units']
       new_column = []
