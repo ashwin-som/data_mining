@@ -94,16 +94,16 @@ def create_candidates(prev_dictionary,k):
             #delete those that i-1 item sets do no exist 
 
             ### new code ###
-            '''temp = list(combo)
+            temp = list(combo)
             exists = True
             for mini_batch in combinations(temp,k-1):
                 #print(mini_batch)
                 if mini_batch not in prev_dictionary:
                     exists = False 
                     break 
-            if exists:'''
+            if exists:
             ### new code ###
-            candidates[combo] = 0
+                candidates[combo] = 0
 
     
 
@@ -278,22 +278,22 @@ def main():
         print()
         print()
         print()'''
-
-    print('==Frequent itemsets (min_supp={0}%)'.format(support*100))
+    f = open("output.txt", "a")
+    print('==Frequent itemsets (min_supp={0}%)'.format(support*100),file=f)
     heap_support = []
     for dict in L:
         for key in dict:
             support = dict[key]
             proper_support = support/num_transactions
-            heapq.heappush(heap_support,(key,proper_support*100))
+            heapq.heappush(heap_support,(-proper_support*100,key))
     while heap_support:
         item = heapq.heappop(heap_support)
-        print('{0},  {1}%'.format(list(item[0]),item[1]))
+        print('{0},  {1}%'.format(list(item[1]),-item[0]),file=f)
     #print(L)
     #print("C: ", C)
     #print(individual_count)
-    print()
-    print()
+    print(file=f)
+    print(file=f)
     '''support = sys.argv[1]
     confidence = sys.argv[2]
     #generate initial item_sets
@@ -305,14 +305,15 @@ def main():
     #printing the association rules
     
     assoc_rules = mine_association_rules(L,confidence,num_transactions)
-    print('==High-confidence association rules (min_conf={0}%)'.format(confidence*100))
+    print('==High-confidence association rules (min_conf={0}%)'.format(confidence*100),file=f)
     heap = []
     for rule in assoc_rules:
         heapq.heappush(heap,(assoc_rules[rule][0]*-1,assoc_rules[rule][1]*-1,rule))
     while heap:
         item = heapq.heappop(heap)
-        print('{0} (Conf: {1:.3f}%, Supp: {2:.3f}%)'.format(item[2],item[0]*-100,item[1]*-100))
+        print('{0} (Conf: {1:.3f}%, Supp: {2:.3f}%)'.format(item[2],item[0]*-100,item[1]*-100),file=f)
     
+    f.close()
 
 if __name__=="__main__": 
     main() 

@@ -1,0 +1,46 @@
+==Frequent itemsets (min_supp=10.0%)
+['mostly_rented'],  88.05496828752642%
+['mostly_affordable'],  69.66173361522199%
+['low'],  49.54193093727978%
+['Brooklyn'],  44.37984496124031%
+['low', 'mostly_rented'],  42.97040169133192%
+['low', 'mostly_affordable'],  42.95278365045807%
+['Brooklyn', 'mostly_rented'],  40.803382663847785%
+['moderately_low'],  38.47780126849894%
+['moderately_low', 'mostly_rented'],  33.86187455954898%
+['Brooklyn', 'mostly_affordable'],  27.660324171952077%
+['Bronx'],  26.07470049330514%
+['Bronx', 'mostly_rented'],  23.50246652572234%
+['mixed_aff_and_stand'],  23.009161381254405%
+['Brooklyn', 'low'],  20.94785059901339%
+['Bronx', 'mostly_affordable'],  20.401691331923892%
+['Brooklyn', 'low', 'mostly_rented'],  20.29598308668076%
+['Manhattan'],  19.679351656095843%
+['Brooklyn', 'moderately_low'],  19.062720225510922%
+['Brooklyn', 'low', 'mostly_affordable'],  17.459478505990134%
+['Manhattan', 'mostly_rented'],  16.948555320648346%
+['Brooklyn', 'moderately_low', 'mostly_rented'],  16.331923890063425%
+['Manhattan', 'mostly_affordable'],  16.13812544045102%
+['moderately_low', 'mostly_affordable'],  14.799154334038056%
+['Bronx', 'low'],  14.376321353065538%
+['Bronx', 'low', 'mostly_affordable'],  13.601127554615926%
+['Brooklyn', 'mixed_aff_and_stand'],  12.790697674418606%
+['Bronx', 'low', 'mostly_rented'],  12.29739252995067%
+['very_low'],  11.980267794221284%
+['mostly_owned'],  10.747004933051445%
+
+
+==High-confidence association rules (min_conf=70.0%)
+('Brooklyn', 'low')=>('mostly_rented',) (Conf: 96.888%, Supp: 20.296%)
+('Bronx', 'low')=>('mostly_affordable',) (Conf: 94.608%, Supp: 13.601%)
+('Brooklyn',)=>('mostly_rented',) (Conf: 91.941%, Supp: 40.803%)
+('Bronx',)=>('mostly_rented',) (Conf: 90.135%, Supp: 23.502%)
+('moderately_low',)=>('mostly_rented',) (Conf: 88.004%, Supp: 33.862%)
+('low',)=>('mostly_rented',) (Conf: 86.735%, Supp: 42.970%)
+('low',)=>('mostly_affordable',) (Conf: 86.700%, Supp: 42.953%)
+('Manhattan',)=>('mostly_rented',) (Conf: 86.124%, Supp: 16.949%)
+('Brooklyn', 'moderately_low')=>('mostly_rented',) (Conf: 85.675%, Supp: 16.332%)
+('Bronx', 'low')=>('mostly_rented',) (Conf: 85.539%, Supp: 12.297%)
+('Brooklyn', 'low')=>('mostly_affordable',) (Conf: 83.347%, Supp: 17.459%)
+('Manhattan',)=>('mostly_affordable',) (Conf: 82.005%, Supp: 16.138%)
+('Bronx',)=>('mostly_affordable',) (Conf: 78.243%, Supp: 20.402%)
