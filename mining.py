@@ -91,7 +91,22 @@ def create_candidates(prev_dictionary,k):
     candidates = {}
     for combo in combinations(set_list,k):
             #candidates.append(combo)
-            candidates[combo] = 0 
+            #delete those that i-1 item sets do no exist 
+
+            ### new code ###
+            temp = list[combo]
+            exists = True
+            for mini_batch in combinations(temp,k-1):
+                if mini_batch not in prev_dictionary:
+                    exists = False 
+                    break 
+            if exists:
+            ### new code ###
+                candidates[combo] = 0
+
+    
+
+     
     return candidates 
 
 def database_item_set(candidates,database,k, support):
@@ -159,11 +174,6 @@ def find_new_item_sets(c_k,k,support): #L -> I think this should be a dictionary
             res.append(c)
     return res
 
-
-def TID_C_K(): #C-head
-    #do we even really need to do this? 
-    #may be necessary for computing support? to see if they exist together?
-    pass
 
 
 
