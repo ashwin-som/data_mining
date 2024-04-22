@@ -5,23 +5,6 @@ import math
 import heapq
 dataset = None   #stores the data so we can access the records and calculate support whenever needed
 
-
-
-
-'''def generate_candidates(df,occurence_counts,k):
-    #depending on value for k, update dictionary_counts 
-    if k==1: #iterate through whole database 
-        for index, row in df.iterrows():
-            for col in df.keys().tolist():
-                value = row[col]
-                if (value,) in occurence_counts:
-                    occurence_counts[(value,)] += 1 
-                else:
-                    occurence_counts[(value,)] = 1 '''
-    
-    #compute the rest for k bwetween 2 and 6
-    #incorporate pruning -> ie only add if confidence of each inidividual item exists 
-
 def create_l1(df, support):
     occurence_counts = {}
     for index, row in df.iterrows():
@@ -48,34 +31,6 @@ def create_l1(df, support):
 
     
     return occurence_counts
-
-def apriori_gen(l,k,support): #C 
-    candidates = []
-    for i in range(len(l)):
-        for j in range(i+1,len(l)):
-            p = list(l[i])
-            q = list(l[j])
-            p.sort()
-            q.sort()
-            if p[:-1] == p[:-1] and p[-1] < q[-1]:
-                c = l[i].union({q[-1]})
-                candidates.append(c)
-
-    #prune step
-    final_candidates = []
-    for c in candidates:
-        subsets = []
-        for comb in combinations(c,k-1):
-            subsets.append(comb)
-        flag = False
-        for subset in subsets:
-            if subset not in l:
-                flag = True
-                break
-        if not flag:
-            final_candidates.append(c)
-
-    return final_candidates
 
         
 
@@ -208,7 +163,7 @@ def apriori(database,support):
     #freq_item_sets = set()
     L.append(l_1)
     while k <= 6:
-        print("k-value is:", k)
+        #print("k-value is:", k)
         k+=1
         c_k = create_candidates(L[k-2],k) #compute options on database given prev exiisting options 
         #print("c_k at index ", k, " is:", c_k)
@@ -217,7 +172,7 @@ def apriori(database,support):
         l_k = database_item_set(c_k,database,k, support)
         #if len(l_k)==0:
         if not l_k:
-            print(k)
+            #print(k)
             break
         else:
             #freq_item_sets.append(i for i in l_k)
@@ -262,12 +217,13 @@ def main():
     '''   NOTE: k can be up to 6 for this specific file '''
     #support = .01
     #confidence = .1
-    support = float(sys.argv[1])
-    confidence = float(sys.argv[2])
+    file_name = sys.argv[1]
+    support = float(sys.argv[2])
+    confidence = float(sys.argv[3])
 
-    dataset = pd.read_csv('modified_housing.csv')
+    dataset = pd.read_csv(file_name)
     num_transactions = len(dataset) #use this to calculate support 
-    print("nun transactions: ", num_transactions)
+    #print("nun transactions: ", num_transactions)
     frequency_count = {}
     updated_support = support*num_transactions
     individual_count = create_l1(dataset,updated_support )
@@ -278,7 +234,7 @@ def main():
         print()
         print()
         print()'''
-    f = open("output.txt", "a")
+    f = open("output.txt", "w")
     print('==Frequent itemsets (min_supp={0}%)'.format(support*100),file=f)
     heap_support = []
     for dict in L:
