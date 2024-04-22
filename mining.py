@@ -94,15 +94,16 @@ def create_candidates(prev_dictionary,k):
             #delete those that i-1 item sets do no exist 
 
             ### new code ###
-            temp = list[combo]
+            '''temp = list(combo)
             exists = True
             for mini_batch in combinations(temp,k-1):
+                #print(mini_batch)
                 if mini_batch not in prev_dictionary:
                     exists = False 
                     break 
-            if exists:
+            if exists:'''
             ### new code ###
-                candidates[combo] = 0
+            candidates[combo] = 0
 
     
 
